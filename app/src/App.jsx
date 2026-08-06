@@ -6,6 +6,8 @@ import LoginPage from "@/pages/LoginPage"
 import RegisterPage from "@/pages/RegisterPage"
 import HomePage from "@/pages/HomePage"
 import ProfilePage from "@/pages/ProfilePage"
+import ServiciosPage from "@/pages/ServiciosPage"
+import ServicioDetallePage from "@/pages/ServicioDetallePage"
 
 export default function App() {
   return (
@@ -17,6 +19,8 @@ export default function App() {
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route path="/" element={<HomePage />} />
             <Route path="/perfil" element={<ProfilePage />} />
+            <Route path="/servicios" element={<ServiciosPage />} />
+            <Route path="/servicios/:id" element={<ServicioDetallePage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
