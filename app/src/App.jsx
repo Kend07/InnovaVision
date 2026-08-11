@@ -8,6 +8,8 @@ import HomePage from "@/pages/HomePage"
 import ProfilePage from "@/pages/ProfilePage"
 import ServiciosPage from "@/pages/ServiciosPage"
 import ServicioDetallePage from "@/pages/ServicioDetallePage"
+import AdicionalesPage from "@/pages/AdicionalesServicePage"
+import AdicionalDetailPage from "@/pages/AdicionalDetailPage"
 
 export default function App() {
   return (
@@ -21,6 +23,8 @@ export default function App() {
             <Route path="/perfil" element={<ProfilePage />} />
             <Route path="/servicios" element={<ServiciosPage />} />
             <Route path="/servicios/:id" element={<ServicioDetallePage />} />
+            <Route path="/adicionales" element={<AdicionalesPage />} />
+            <Route path="/adicionales/:id" element={<AdicionalDetailPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
