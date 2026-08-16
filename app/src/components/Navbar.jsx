@@ -21,6 +21,11 @@ export default function Navbar() {
           <Link to="/perfil" className="text-sm text-muted-foreground hover:text-foreground">
             Mi perfil
           </Link>
+          {usuario?.rol?.nombre === "Administrador" && (
+            <Link to="/empleados" className="text-sm text-muted-foreground hover:text-foreground">
+              Empleados
+            </Link>
+          )}
         </div>
         <div className="flex items-center gap-4">
           {usuario && (

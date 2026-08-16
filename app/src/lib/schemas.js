@@ -64,3 +64,26 @@ export const registroSchema = z
     message: "Las contraseñas no coinciden",
     path: ["confirmPassword"],
   })
+
+  export const empleadoSchema = z
+  .object({
+    usuarioId: z.coerce.number().int().positive("Seleccione un usuario"),
+    especialidadId: z.coerce.number().int().positive("Seleccione una especialidad"),
+    codigoEmpleado: z
+      .string()
+      .trim()
+      .min(3, "El código debe contener al menos 3 caracteres")
+      .max(30, "El código no puede superar 30 caracteres")
+      .regex(/^[A-Za-z0-9_-]+$/, "El código solo puede contener letras, números, guiones y guiones bajos"),
+    descripcion: z
+      .union([
+        z
+          .string()
+          .trim()
+          .min(3, "La descripción debe contener al menos 3 caracteres")
+          .max(500, "La descripción no puede superar 500 caracteres"),
+        z.literal(""),
+      ])
+      .optional(),
+    servicioIds: z.array(z.coerce.number().int().positive()).min(1, "Debe asignar al menos un servicio"),
+  })

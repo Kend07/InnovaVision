@@ -10,6 +10,10 @@ import ServiciosPage from "@/pages/ServiciosPage"
 import ServicioDetallePage from "@/pages/ServicioDetallePage"
 import AdicionalesPage from "@/pages/AdicionalesServicePage"
 import AdicionalDetailPage from "@/pages/AdicionalDetailPage"
+import EmpleadosPage from "@/pages/empleados/EmpleadosPage"
+import EmpleadoFormPage from "@/pages/empleados/EmpleadoFormPage"
+import EmpleadoDetallePage from "@/pages/empleados/EmpleadoDetallePage"
+import RequireRole from "@/components/RequireRole"
 
 export default function App() {
   return (
@@ -21,6 +25,38 @@ export default function App() {
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route path="/" element={<HomePage />} />
             <Route path="/perfil" element={<ProfilePage />} />
+            <Route
+              path="/empleados"
+              element={
+                <RequireRole rol="Administrador">
+                  <EmpleadosPage />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/empleados/nuevo"
+              element={
+                <RequireRole rol="Administrador">
+                  <EmpleadoFormPage />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/empleados/:id"
+              element={
+                <RequireRole rol="Administrador">
+                  <EmpleadoDetallePage />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/empleados/:id/editar"
+              element={
+                <RequireRole rol="Administrador">
+                  <EmpleadoFormPage />
+                </RequireRole>
+              }
+            />
             <Route path="/servicios" element={<ServiciosPage />} />
             <Route path="/servicios/:id" element={<ServicioDetallePage />} />
             <Route path="/adicionales" element={<AdicionalesPage />} />

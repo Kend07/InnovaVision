@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { useAuth } from "@/context/AuthContext"
 import { obtenerRoles } from "@/lib/roles"
@@ -6,14 +7,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 const OPCIONES_POR_ROL = {
   Administrador: [
-    { titulo: "Gestión de usuarios", descripcion: "Consultar y administrar los usuarios del sistema." },
-    { titulo: "Gestión de servicios", descripcion: "Administrar los servicios ofrecidos." },
-    { titulo: "Gestión de empleados", descripcion: "Administrar los empleados del establecimiento." },
+    { titulo: "Gestión de usuarios", descripcion: "Consultar y administrar los usuarios del sistema.", ruta: null },
+    { titulo: "Gestión de servicios", descripcion: "Administrar los servicios ofrecidos.", ruta: "/servicios" },
+    { titulo: "Servicios adicionales", descripcion: "Administrar los servicios adicionales.", ruta: "/adicionales" },
+    { titulo: "Gestión de empleados", descripcion: "Administrar los empleados del establecimiento.", ruta: "/empleados" },
   ],
-  Empleado: [{ titulo: "Mis citas asignadas", descripcion: "Consultar y atender las citas asignadas." }],
+  Empleado: [{ titulo: "Mis citas asignadas", descripcion: "Consultar y atender las citas asignadas.", ruta: null }],
   Cliente: [
-    { titulo: "Registrar cita", descripcion: "Agendar una nueva cita." },
-    { titulo: "Mis citas", descripcion: "Consultar y cancelar mis citas." },
+    { titulo: "Registrar cita", descripcion: "Agendar una nueva cita.", ruta: null },
+    { titulo: "Mis citas", descripcion: "Consultar y cancelar mis citas.", ruta: null },
   ],
 }
 
@@ -48,7 +50,13 @@ export default function HomePage() {
                 <CardDescription>{opcion.descripcion}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button disabled>Próximamente</Button>
+                {opcion.ruta ? (
+                  <Link to={opcion.ruta}>
+                    <Button>Ir al módulo</Button>
+                  </Link>
+                ) : (
+                  <Button disabled>Próximamente</Button>
+                )}
               </CardContent>
             </Card>
           ))
