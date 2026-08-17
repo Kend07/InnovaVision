@@ -60,12 +60,16 @@ export class UsuarioRoutes {
          *           nullable: true
          *           minLength: 8
          *           maxLength: 25
+         *           pattern: '^[0-9+\-()\s]+$'
          *           example: "8888-8888"
          *         password:
          *           type: string
          *           format: password
          *           minLength: 8
          *           maxLength: 100
+         *           description: >
+         *             Debe contener al menos una letra mayúscula, una letra
+         *             minúscula y un número.
          *           example: Cliente123
          *
          *     LoginInput:
@@ -124,6 +128,7 @@ export class UsuarioRoutes {
          *           nullable: true
          *           minLength: 8
          *           maxLength: 25
+         *           pattern: '^[0-9+\-()\s]+$'
          *           example: "8888-9999"
          *         rolId:
          *           type: integer

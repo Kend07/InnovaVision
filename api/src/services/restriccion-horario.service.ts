@@ -1,13 +1,14 @@
 import { prisma } from "../config/prisma";
 import {
-    toDateOnly,
-    toTime,
-} from "./common.service";
-import {
     CreateRestriccionHorarioDto,
     UpdateEstadoRestriccionHorarioDto,
     UpdateRestriccionHorarioDto,
 } from "../dtos/restriccion-horario.dto";
+import {
+    fechaParaDateColumn,
+    horaParaTimeColumn,
+    mapRestriccionOutput,
+} from "../utils/timezone";
 
 const usuarioSelect = {
     id: true,
@@ -19,6 +20,11 @@ const usuarioSelect = {
     activo: true,
 } as const;
 
+/**
+ * Valida el tipo, el empleado (si aplica) y los traslapes,
+ * y devuelve fecha/horaInicio/horaFin ya listos para guardar
+ * (columnas @db.Date / @db.Time, sin desfase de zona horaria).
+ */
 async function validarRestriccion(
     data: {
         tipoRestriccionId: number;
@@ -30,315 +36,186 @@ async function validarRestriccion(
     },
     restriccionIdExcluir?: number
 ) {
-    const tipoRestriccion =
-        await prisma.tipoRestriccionHorario.findUnique({
-            where: {
-                id:
-                    data.tipoRestriccionId,
-            },
+    const tipoRestriccion = await prisma.tipoRestriccionHorario.findUnique({
+        where: { id: data.tipoRestriccionId },
+        select: { id: true },
+    });
+    if (!tipoRestriccion) {
+        throw new Error("El tipo de restricción indicado no existe");
+    }
+
+    if (data.empleadoId !== null) {
+        const empleado = await prisma.empleado.findUnique({
+            where: { id: data.empleadoId },
             select: {
                 id: true,
+                activo: true,
+                usuario: { select: { activo: true } },
             },
         });
-    if (!tipoRestriccion) {
-        throw new Error(
-            "El tipo de restricción indicado no existe"
-        );
-    }
-    if (
-        data.empleadoId !== null
-    ) {
-        const empleado =
-            await prisma.empleado.findUnique({
-                where: {
-                    id:
-                        data.empleadoId,
-                },
-                select: {
-                    id: true,
-                    activo: true,
-                    usuario: {
-                        select: {
-                            activo: true,
-                        },
-                    },
-                },
-            });
         if (!empleado) {
-            throw new Error(
-                "El empleado indicado no existe"
-            );
+            throw new Error("El empleado indicado no existe");
+        }
+        if (!empleado.activo || !empleado.usuario.activo) {
+            throw new Error("El empleado indicado se encuentra inactivo");
+        }
+    }
+
+    // Conversión literal: DATE y TIME no tienen zona horaria,
+    // no depende de la máquina donde corre el servidor.
+    const fecha = fechaParaDateColumn(data.fecha);
+    const horaInicio = data.horaInicio
+        ? horaParaTimeColumn(data.horaInicio)
+        : null;
+    const horaFin = data.horaFin ? horaParaTimeColumn(data.horaFin) : null;
+
+    const restriccionesExistentes = await prisma.restriccionHorario.findMany({
+        where: {
+            id: restriccionIdExcluir ? { not: restriccionIdExcluir } : undefined,
+            fecha,
+            activo: true,
+            empleadoId: data.empleadoId,
+        },
+        select: {
+            id: true,
+            todoElDia: true,
+            horaInicio: true,
+            horaFin: true,
+        },
+    });
+
+    const existeConflicto = restriccionesExistentes.some((restriccion) => {
+        if (data.todoElDia || restriccion.todoElDia) {
+            return true;
         }
         if (
-            !empleado.activo ||
-            !empleado.usuario.activo
+            !horaInicio ||
+            !horaFin ||
+            !restriccion.horaInicio ||
+            !restriccion.horaFin
         ) {
-            throw new Error(
-                "El empleado indicado se encuentra inactivo"
-            );
+            return false;
         }
-    }
-    const fecha =
-        toDateOnly(
-            data.fecha
-        );
-    const horaInicio =
-        data.horaInicio
-            ? toTime(
-                data.horaInicio
-            )
-            : null;
-    const horaFin =
-        data.horaFin
-            ? toTime(
-                data.horaFin
-            )
-            : null;
-    const restriccionesExistentes =
-        await prisma.restriccionHorario.findMany({
-            where: {
-                id:
-                    restriccionIdExcluir
-                        ? {
-                            not:
-                                restriccionIdExcluir,
-                        }
-                        : undefined,
-                fecha,
-                activo:
-                    true,
-                empleadoId:
-                    data.empleadoId,
-            },
-            select: {
-                id: true,
-                todoElDia: true,
-                horaInicio: true,
-                horaFin: true,
-            },
-        });
-    const existeConflicto =
-        restriccionesExistentes.some(
-            (restriccion) => {
-                if (
-                    data.todoElDia ||
-                    restriccion.todoElDia
-                ) {
-                    return true;
-                }
-                if (
-                    !horaInicio ||
-                    !horaFin ||
-                    !restriccion.horaInicio ||
-                    !restriccion.horaFin
-                ) {
-                    return false;
-                }
-                return (
-                    horaInicio <
-                    restriccion.horaFin &&
-                    horaFin >
-                    restriccion.horaInicio
-                );
-            }
-        );
+        return horaInicio < restriccion.horaFin && horaFin > restriccion.horaInicio;
+    });
+
     if (existeConflicto) {
         throw new Error(
             "La restricción se traslapa con otra restricción registrada"
         );
     }
-    return {
-        fecha,
-        horaInicio,
-        horaFin,
-    };
+
+    return { fecha, horaInicio, horaFin };
 }
 
 export const restriccionHorarioService = {
     async listar() {
-        return await prisma.restriccionHorario.findMany({
+        const restricciones = await prisma.restriccionHorario.findMany({
             include: {
-                tipoRestriccion:
-                    true,
+                tipoRestriccion: true,
                 empleado: {
-                    include: {
-                        usuario: {
-                            select:
-                                usuarioSelect,
-                        },
-                    },
+                    include: { usuario: { select: usuarioSelect } },
                 },
             },
-            orderBy: [
-                {
-                    fecha:
-                        "desc",
-                },
-                {
-                    horaInicio:
-                        "asc",
-                },
-            ],
+            orderBy: [{ fecha: "desc" }, { horaInicio: "asc" }],
         });
+        return restricciones.map(mapRestriccionOutput);
     },
 
-    async obtenerPorId(
-        id: number
-    ) {
-        return await prisma.restriccionHorario.findUnique({
-            where: {
-                id,
-            },
+    async obtenerPorId(id: number) {
+        const restriccion = await prisma.restriccionHorario.findUnique({
+            where: { id },
             include: {
-                tipoRestriccion:
-                    true,
+                tipoRestriccion: true,
                 empleado: {
-                    include: {
-                        usuario: {
-                            select:
-                                usuarioSelect,
-                        },
-                    },
+                    include: { usuario: { select: usuarioSelect } },
                 },
             },
         });
+        return restriccion ? mapRestriccionOutput(restriccion) : null;
     },
-    async crear(
-        data: CreateRestriccionHorarioDto
-    ) {
-        const {
-            fecha,
-            horaInicio,
-            horaFin,
-        } = await validarRestriccion(
-            data
-        );
-        return await prisma.restriccionHorario.create({
+
+    async crear(data: CreateRestriccionHorarioDto) {
+        const { fecha, horaInicio, horaFin } = await validarRestriccion(data);
+
+        const restriccion = await prisma.restriccionHorario.create({
             data: {
-                tipoRestriccionId:
-                    data.tipoRestriccionId,
-                empleadoId:
-                    data.empleadoId,
+                tipoRestriccionId: data.tipoRestriccionId,
+                empleadoId: data.empleadoId,
                 fecha,
                 horaInicio,
                 horaFin,
-                todoElDia:
-                    data.todoElDia,
-                motivo:
-                    data.motivo.trim(),
-                activo:
-                    true,
+                todoElDia: data.todoElDia,
+                motivo: data.motivo.trim(),
+                activo: true,
             },
             include: {
-                tipoRestriccion:
-                    true,
+                tipoRestriccion: true,
                 empleado: {
-                    include: {
-                        usuario: {
-                            select:
-                                usuarioSelect,
-                        },
-                    },
+                    include: { usuario: { select: usuarioSelect } },
                 },
             },
         });
+
+        return mapRestriccionOutput(restriccion);
     },
 
-    async modificar(
-        id: number,
-        data: UpdateRestriccionHorarioDto
-    ) {
-        const restriccionActual =
-            await prisma.restriccionHorario.findUnique({
-                where: {
-                    id,
-                },
-                select: {
-                    id: true,
-                },
-            });
+    async modificar(id: number, data: UpdateRestriccionHorarioDto) {
+        const restriccionActual = await prisma.restriccionHorario.findUnique({
+            where: { id },
+            select: { id: true },
+        });
         if (!restriccionActual) {
-            throw new Error(
-                "La restricción de horario no existe"
-            );
+            throw new Error("La restricción de horario no existe");
         }
-        const {
-            fecha,
-            horaInicio,
-            horaFin,
-        } = await validarRestriccion(
+
+        const { fecha, horaInicio, horaFin } = await validarRestriccion(
             data,
             id
         );
-        return await prisma.restriccionHorario.update({
-            where: {
-                id,
-            },
+
+        const restriccion = await prisma.restriccionHorario.update({
+            where: { id },
             data: {
-                tipoRestriccionId:
-                    data.tipoRestriccionId,
-                empleadoId:
-                    data.empleadoId,
+                tipoRestriccionId: data.tipoRestriccionId,
+                empleadoId: data.empleadoId,
                 fecha,
                 horaInicio,
                 horaFin,
-                todoElDia:
-                    data.todoElDia,
-                motivo:
-                    data.motivo.trim(),
+                todoElDia: data.todoElDia,
+                motivo: data.motivo.trim(),
             },
             include: {
-                tipoRestriccion:
-                    true,
+                tipoRestriccion: true,
                 empleado: {
-                    include: {
-                        usuario: {
-                            select:
-                                usuarioSelect,
-                        },
-                    },
+                    include: { usuario: { select: usuarioSelect } },
                 },
             },
         });
+
+        return mapRestriccionOutput(restriccion);
     },
-    async cambiarEstado(
-        id: number,
-        data: UpdateEstadoRestriccionHorarioDto
-    ) {
-        const restriccion =
-            await prisma.restriccionHorario.findUnique({
-                where: {
-                    id,
-                },
-                select: {
-                    id: true,
-                },
-            });
+
+    async cambiarEstado(id: number, data: UpdateEstadoRestriccionHorarioDto) {
+        const restriccion = await prisma.restriccionHorario.findUnique({
+            where: { id },
+            select: { id: true },
+        });
         if (!restriccion) {
-            throw new Error(
-                "La restricción de horario no existe"
-            );
+            throw new Error("La restricción de horario no existe");
         }
-        return await prisma.restriccionHorario.update({
-            where: {
-                id,
-            },
-            data: {
-                activo:
-                    data.activo,
-            },
+
+        const restriccionActualizada = await prisma.restriccionHorario.update({
+            where: { id },
+            data: { activo: data.activo },
             include: {
-                tipoRestriccion:
-                    true,
+                tipoRestriccion: true,
                 empleado: {
-                    include: {
-                        usuario: {
-                            select:
-                                usuarioSelect,
-                        },
-                    },
+                    include: { usuario: { select: usuarioSelect } },
                 },
             },
         });
+
+        return mapRestriccionOutput(restriccionActualizada);
     },
 };

@@ -1,12 +1,10 @@
 import { prisma } from "../config/prisma";
 import {
-    toTime,
-} from "./common.service";
-import {
     CreateHorarioAtencionDto,
     UpdateEstadoHorarioAtencionDto,
     UpdateHorarioAtencionDto,
 } from "../dtos/horario-atencion.dto";
+import { horaParaTimeColumn, mapHorarioAtencionOutput } from "../utils/timezone";
 
 /**
  * Valida el día y los traslapes de horario.
@@ -19,212 +17,112 @@ async function validarHorario(
     },
     horarioIdExcluir?: number
 ) {
-    const diaSemana =
-        await prisma.diaSemana.findUnique({
-            where: {
-                id:
-                    data.diaSemanaId,
-            },
-            select: {
-                id: true,
-            },
-        });
+    const diaSemana = await prisma.diaSemana.findUnique({
+        where: { id: data.diaSemanaId },
+        select: { id: true },
+    });
     if (!diaSemana) {
-        throw new Error(
-            "El día de la semana indicado no existe"
-        );
+        throw new Error("El día de la semana indicado no existe");
     }
-    const horaInicio =
-        toTime(
-            data.horaInicio
-        );
-    const horaFin =
-        toTime(
-            data.horaFin
-        );
-    const horarioTraslapado =
-        await prisma.horarioAtencion.findFirst({
-            where: {
-                id:
-                    horarioIdExcluir
-                        ? {
-                            not:
-                                horarioIdExcluir,
-                        }
-                        : undefined,
-                diaSemanaId:
-                    data.diaSemanaId,
-                AND: [
-                    {
-                        horaInicio: {
-                            lt:
-                                horaFin,
-                        },
-                    },
-                    {
-                        horaFin: {
-                            gt:
-                                horaInicio,
-                        },
-                    },
-                ],
-            },
-            select: {
-                id: true,
-                horaInicio: true,
-                horaFin: true,
-            },
-        });
+
+    const horaInicio = horaParaTimeColumn(data.horaInicio);
+    const horaFin = horaParaTimeColumn(data.horaFin);
+
+    const horarioTraslapado = await prisma.horarioAtencion.findFirst({
+        where: {
+            id: horarioIdExcluir ? { not: horarioIdExcluir } : undefined,
+            diaSemanaId: data.diaSemanaId,
+            AND: [
+                { horaInicio: { lt: horaFin } },
+                { horaFin: { gt: horaInicio } },
+            ],
+        },
+        select: { id: true, horaInicio: true, horaFin: true },
+    });
     if (horarioTraslapado) {
         throw new Error(
             "El horario se traslapa con otro horario registrado para el mismo día"
         );
     }
-    return {
-        horaInicio,
-        horaFin,
-    };
+    return { horaInicio, horaFin };
 }
 
 export const horarioAtencionService = {
-    /**
-     * Lista todos los horarios.
-     */
     async listar() {
-        return await prisma.horarioAtencion.findMany({
-            include: {
-                diaSemana: true,
-            },
+        const horarios = await prisma.horarioAtencion.findMany({
+            include: { diaSemana: true },
             orderBy: [
-                {
-                    diaSemana: {
-                        numeroOrden:
-                            "asc",
-                    },
-                },
-                {
-                    horaInicio:
-                        "asc",
-                },
+                { diaSemana: { numeroOrden: "asc" } },
+                { horaInicio: "asc" },
             ],
         });
+        return horarios.map(mapHorarioAtencionOutput);
     },
-    /**
-     * Obtiene un horario por ID.
-     */
-    async obtenerPorId(
-        id: number
-    ) {
-        return await prisma.horarioAtencion.findUnique({
-            where: {
-                id,
-            },
-            include: {
-                diaSemana: true,
-            },
+
+    async obtenerPorId(id: number) {
+        const horario = await prisma.horarioAtencion.findUnique({
+            where: { id },
+            include: { diaSemana: true },
         });
+        return horario ? mapHorarioAtencionOutput(horario) : null;
     },
-    /**
-     * Crea un horario activo.
-     */
-    async crear(
-        data: CreateHorarioAtencionDto
-    ) {
-        const {
-            horaInicio,
-            horaFin,
-        } = await validarHorario(
-            data
-        );
-        return await prisma.horarioAtencion.create({
+
+    async crear(data: CreateHorarioAtencionDto) {
+        // validarHorario ya retorna Date listos para guardar
+        const { horaInicio, horaFin } = await validarHorario(data);
+
+        const horario = await prisma.horarioAtencion.create({
             data: {
-                diaSemanaId:
-                    data.diaSemanaId,
+                diaSemanaId: data.diaSemanaId,
                 horaInicio,
                 horaFin,
-                activo:
-                    true,
+                activo: true,
             },
-            include: {
-                diaSemana: true,
-            },
+            include: { diaSemana: true },
         });
+
+        return mapHorarioAtencionOutput(horario);
     },
-    /**
-     * Modifica completamente un horario.
-     */
-    async modificar(
-        id: number,
-        data: UpdateHorarioAtencionDto
-    ) {
-        const horarioActual =
-            await prisma.horarioAtencion.findUnique({
-                where: {
-                    id,
-                },
-                select: {
-                    id: true,
-                },
-            });
+
+    async modificar(id: number, data: UpdateHorarioAtencionDto) {
+        const horarioActual = await prisma.horarioAtencion.findUnique({
+            where: { id },
+            select: { id: true },
+        });
         if (!horarioActual) {
-            throw new Error(
-                "El horario de atención no existe"
-            );
+            throw new Error("El horario de atención no existe");
         }
-        const {
-            horaInicio,
-            horaFin,
-        } = await validarHorario(
-            data,
-            id
-        );
-        return await prisma.horarioAtencion.update({
-            where: {
-                id,
-            },
+
+        const { horaInicio, horaFin } = await validarHorario(data, id);
+
+        const horario = await prisma.horarioAtencion.update({
+            where: { id },
             data: {
-                diaSemanaId:
-                    data.diaSemanaId,
+                diaSemanaId: data.diaSemanaId,
                 horaInicio,
                 horaFin,
             },
-            include: {
-                diaSemana: true,
-            },
+            include: { diaSemana: true },
         });
+
+        return mapHorarioAtencionOutput(horario);
     },
-    /**
-     * Activa o desactiva un horario.
-     */
-    async cambiarEstado(
-        id: number,
-        data: UpdateEstadoHorarioAtencionDto
-    ) {
-        const horario =
-            await prisma.horarioAtencion.findUnique({
-                where: {
-                    id,
-                },
-                select: {
-                    id: true,
-                },
-            });
-        if (!horario) {
-            throw new Error(
-                "El horario de atención no existe"
-            );
-        }
-        return await prisma.horarioAtencion.update({
-            where: {
-                id,
-            },
-            data: {
-                activo:
-                    data.activo,
-            },
-            include: {
-                diaSemana: true,
-            },
+
+    async cambiarEstado(id: number, data: UpdateEstadoHorarioAtencionDto) {
+        const horario = await prisma.horarioAtencion.findUnique({
+            where: { id },
+            select: { id: true },
         });
+        if (!horario) {
+            throw new Error("El horario de atención no existe");
+        }
+
+        const horarioActualizado = await prisma.horarioAtencion.update({
+            where: { id },
+            data: { activo: data.activo },
+            include: { diaSemana: true },
+        });
+
+        return mapHorarioAtencionOutput(horarioActualizado);
     },
 };

@@ -32,6 +32,9 @@ export class HorarioAtencionRoutes {
          *         - diaSemanaId
          *         - horaInicio
          *         - horaFin
+         *       description: >
+         *         horaInicio debe ser estrictamente menor que horaFin
+         *         (validación aplicada además del formato de cada campo).
          *       properties:
          *         diaSemanaId:
          *           type: integer
@@ -53,6 +56,9 @@ export class HorarioAtencionRoutes {
          *         - diaSemanaId
          *         - horaInicio
          *         - horaFin
+         *       description: >
+         *         horaInicio debe ser estrictamente menor que horaFin
+         *         (validación aplicada además del formato de cada campo).
          *       properties:
          *         diaSemanaId:
          *           type: integer
@@ -60,9 +66,11 @@ export class HorarioAtencionRoutes {
          *           example: 1
          *         horaInicio:
          *           type: string
+         *           pattern: '^([01]\d|2[0-3]):[0-5]\d$'
          *           example: "09:00"
          *         horaFin:
          *           type: string
+         *           pattern: '^([01]\d|2[0-3]):[0-5]\d$'
          *           example: "18:00"
          *
          *     CambiarEstadoHorarioAtencionInput:

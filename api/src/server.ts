@@ -21,7 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
     res.json({
-        message: "API de eventos funcionando correctamente",
+        message: "API de citas funcionando correctamente",
     });
 });
 

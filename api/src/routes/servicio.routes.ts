@@ -46,6 +46,7 @@ export class ServicioRoutes {
          *           type: number
          *           format: double
          *           minimum: 0.01
+         *           maximum: 99999999.99
          *           example: 8000
          *         duracionMinutos:
          *           type: integer
@@ -60,6 +61,12 @@ export class ServicioRoutes {
          *           type: string
          *           nullable: true
          *           maxLength: 255
+         *           pattern: '^[a-zA-Z0-9._-]+\.(jpg|jpeg|png|webp)$'
+         *           description: >
+         *             Solo se guarda el nombre del archivo generado al subir la
+         *             imagen (endpoint /images/upload). No se guarda la carpeta,
+         *             ruta ni URL completa. Si no hay imagen, enviar null (valor
+         *             por defecto).
          *           example: servicio-1783628774262.png
          *
          *     ActualizarServicioInput:
@@ -87,6 +94,7 @@ export class ServicioRoutes {
          *           type: number
          *           format: double
          *           minimum: 0.01
+         *           maximum: 99999999.99
          *           example: 9500
          *         duracionMinutos:
          *           type: integer
@@ -101,6 +109,11 @@ export class ServicioRoutes {
          *           type: string
          *           nullable: true
          *           maxLength: 255
+         *           pattern: '^[a-zA-Z0-9._-]+\.(jpg|jpeg|png|webp)$'
+         *           description: >
+         *             Debe enviarse el campo (a diferencia de la creación, aquí
+         *             es obligatorio, aunque puede ser null). Solo se guarda el
+         *             nombre del archivo, nunca la carpeta, ruta o URL completa.
          *           example: servicio-actualizado.png
          *
          *     CambiarEstadoServicioInput:

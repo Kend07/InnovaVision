@@ -49,6 +49,7 @@ export class ServicioAdicionalRoutes {
          *           type: number
          *           format: double
          *           minimum: 0
+         *           maximum: 99999999.99
          *           example: 3000
          *
          *     ActualizarServicioAdicionalInput:
@@ -73,6 +74,7 @@ export class ServicioAdicionalRoutes {
          *           type: number
          *           format: double
          *           minimum: 0
+         *           maximum: 99999999.99
          *           example: 4500
          *
          *     CambiarEstadoServicioAdicionalInput:

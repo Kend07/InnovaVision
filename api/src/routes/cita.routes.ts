@@ -46,6 +46,10 @@ export class CitaRoutes {
          *         - costoTotal
          *         - observaciones
          *         - adicionalIds
+         *       description: >
+         *         horaInicio debe ser estrictamente menor que horaFin. El API
+         *         guarda la duración y los costos enviados sin recalcularlos;
+         *         adicionalIds no puede contener identificadores duplicados.
          *       properties:
          *         clienteId:
          *           type: integer
@@ -82,22 +86,27 @@ export class CitaRoutes {
          *         duracionMinutos:
          *           type: integer
          *           minimum: 1
+         *           maximum: 1440
          *           example: 60
          *         precioServicio:
          *           type: number
          *           minimum: 0.01
+         *           maximum: 99999999.99
          *           example: 12000
          *         costoAdicionales:
          *           type: number
          *           minimum: 0
+         *           maximum: 99999999.99
          *           example: 3000
          *         costoTotal:
          *           type: number
          *           minimum: 0.01
+         *           maximum: 99999999.99
          *           example: 15000
          *         observaciones:
          *           type: string
          *           nullable: true
+         *           minLength: 3
          *           maxLength: 500
          *           example: Cliente solicita atención puntual.
          *         adicionalIds:
@@ -124,6 +133,11 @@ export class CitaRoutes {
          *         - costoTotal
          *         - observaciones
          *         - adicionalIds
+         *       description: >
+         *         horaInicio debe ser estrictamente menor que horaFin. No se
+         *         permite modificar estadoCitaId, creadoPorUsuarioId ni
+         *         motivoCancelacion mediante este endpoint; adicionalIds no
+         *         puede contener identificadores duplicados.
          *       properties:
          *         clienteId:
          *           type: integer
@@ -146,18 +160,24 @@ export class CitaRoutes {
          *         duracionMinutos:
          *           type: integer
          *           minimum: 1
+         *           maximum: 1440
          *         precioServicio:
          *           type: number
          *           minimum: 0.01
+         *           maximum: 99999999.99
          *         costoAdicionales:
          *           type: number
          *           minimum: 0
+         *           maximum: 99999999.99
          *         costoTotal:
          *           type: number
          *           minimum: 0.01
+         *           maximum: 99999999.99
          *         observaciones:
          *           type: string
          *           nullable: true
+         *           minLength: 3
+         *           maxLength: 500
          *         adicionalIds:
          *           type: array
          *           uniqueItems: true
@@ -196,6 +216,7 @@ export class CitaRoutes {
          *         - fecha
          *         - horaInicio
          *         - horaFin
+         *       description: horaInicio debe ser estrictamente menor que horaFin.
          *       properties:
          *         empleadoId:
          *           type: integer

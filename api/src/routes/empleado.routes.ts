@@ -50,6 +50,7 @@ export class EmpleadoRoutes {
          *         descripcion:
          *           type: string
          *           nullable: true
+         *           minLength: 3
          *           maxLength: 500
          *           example: Empleado especializado en corte y barbería.
          *         servicioIds:
@@ -89,6 +90,7 @@ export class EmpleadoRoutes {
          *         descripcion:
          *           type: string
          *           nullable: true
+         *           minLength: 3
          *           maxLength: 500
          *           example: Empleado especializado en barbería y estilismo.
          *         servicioIds:

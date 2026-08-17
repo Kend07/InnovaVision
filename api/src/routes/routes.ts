@@ -12,6 +12,7 @@ import { HorarioAtencionRoutes } from "./horario-atencion.routes";
 import { TipoRestriccionHorarioRoutes } from "./tipo-restriccion-horario.routes";
 import { RestriccionHorarioRoutes } from "./restriccion-horario.routes";
 import { CitaRoutes } from "./cita.routes";
+import { ImageRoutes } from "./image.routes";
 
 export class AppRoutes {
     static get routes(): Router {
@@ -34,6 +35,9 @@ export class AppRoutes {
         router.use("/empleados", EmpleadoRoutes.routes);
         router.use("/restricciones-horario", RestriccionHorarioRoutes.routes);
         router.use("/citas", CitaRoutes.routes);
+
+        //Subir imágenes
+        router.use("/images", ImageRoutes.routes);
 
         return router;
     }

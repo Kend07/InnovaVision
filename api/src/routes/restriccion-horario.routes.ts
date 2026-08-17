@@ -28,6 +28,12 @@ export class RestriccionHorarioRoutes {
          *     CrearRestriccionHorarioInput:
          *       type: object
          *       additionalProperties: false
+         *       description: >
+         *         Reglas cruzadas aplicadas además de la validación de cada
+         *         campo: si todoElDia es true, horaInicio y horaFin deben
+         *         enviarse como null; si todoElDia es false, horaInicio y
+         *         horaFin son obligatorios (no null) y horaInicio debe ser
+         *         estrictamente menor que horaFin.
          *       required:
          *         - tipoRestriccionId
          *         - empleadoId
