@@ -1,10 +1,12 @@
 import { useFetch } from "@/hooks/useFetch"
 import { obtenerServicios } from "@/lib/servicios"
+import { usePageTitle } from "@/hooks/usePageTitle"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Link } from "react-router-dom"
 
 
 export default function ServiciosPage() {
+    usePageTitle("Servicios")
     const { data: servicios, cargando, error } = useFetch(obtenerServicios)
 
     if (cargando) {

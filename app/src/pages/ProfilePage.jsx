@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react"
 import { useAuth } from "@/context/AuthContext"
 import { obtenerPerfil } from "@/lib/auth"
+import { usePageTitle } from "@/hooks/usePageTitle"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function ProfilePage() {
+  usePageTitle("Mi perfil")
   const { usuario } = useAuth()
   const [perfil, setPerfil] = useState(null)
 

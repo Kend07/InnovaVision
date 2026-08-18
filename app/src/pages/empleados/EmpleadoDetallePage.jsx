@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { useFetch } from "@/hooks/useFetch"
 import { obtenerEmpleadoPorId, obtenerAgendaEmpleado } from "@/lib/empleados"
+import { usePageTitle } from "@/hooks/usePageTitle"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -22,6 +23,7 @@ export default function EmpleadoDetallePage() {
   const [fechaAgenda, setFechaAgenda] = useState(fechaLocal)
 
   const { data: empleado, cargando, error } = useFetch(() => obtenerEmpleadoPorId(id), [id])
+  usePageTitle(empleado ? `${empleado.usuario?.nombre} ${empleado.usuario?.primerApellido}` : null)
   const { data: agenda, cargando: cargandoAgenda } = useFetch(
     () => obtenerAgendaEmpleado(id, fechaAgenda),
     [id, fechaAgenda]

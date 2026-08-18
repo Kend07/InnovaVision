@@ -2,6 +2,7 @@ import { Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { useAuth } from "@/context/AuthContext"
 import { obtenerRoles } from "@/lib/roles"
+import { usePageTitle } from "@/hooks/usePageTitle"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -20,6 +21,7 @@ const OPCIONES_POR_ROL = {
 }
 
 export default function HomePage() {
+  usePageTitle("Inicio")
   const { usuario } = useAuth()
   const [roles, setRoles] = useState([])
 

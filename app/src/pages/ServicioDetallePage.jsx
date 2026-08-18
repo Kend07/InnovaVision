@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom"
 import { useFetch } from "@/hooks/useFetch"
 import { obtenerServicioPorId } from "@/lib/servicios"
+import { usePageTitle } from "@/hooks/usePageTitle"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function ServicioDetallePage() {
@@ -9,6 +10,7 @@ export default function ServicioDetallePage() {
         () => obtenerServicioPorId(id),
         [id]
     )
+    usePageTitle(servicio ? servicio.nombre : null)
 
     if (cargando) {
         return <p className="p-6 text-muted-foreground">Cargando servicio...</p>

@@ -2,10 +2,12 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import { useFetch } from "@/hooks/useFetch"
 import { obtenerEmpleados, cambiarEstadoEmpleado } from "@/lib/empleados"
+import { usePageTitle } from "@/hooks/usePageTitle"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function EmpleadosPage() {
+  usePageTitle("Empleados")
   const [recarga, setRecarga] = useState(0)
   const [errorAccion, setErrorAccion] = useState("")
   const { data: empleados, cargando, error } = useFetch(obtenerEmpleados, [recarga])

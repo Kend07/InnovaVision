@@ -12,6 +12,7 @@ import {
   obtenerEspecialidades,
   obtenerServicios,
 } from "@/lib/empleados"
+import { usePageTitle } from "@/hooks/usePageTitle"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -20,6 +21,7 @@ import { Label } from "@/components/ui/label"
 export default function EmpleadoFormPage() {
   const { id } = useParams()
   const esEdicion = Boolean(id)
+  usePageTitle(esEdicion ? "Editar empleado" : "Nuevo empleado")
   const navigate = useNavigate()
   const [errorGeneral, setErrorGeneral] = useState("")
   const [erroresApi, setErroresApi] = useState([])
@@ -142,6 +144,8 @@ export default function EmpleadoFormPage() {
               <select
                 id="usuarioId"
                 className="border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm"
+                aria-invalid={errors.usuarioId ? true : undefined}
+                aria-describedby={errors.usuarioId ? "usuarioId-error" : undefined}
                 {...register("usuarioId")}
               >
                 <option value="">Seleccione un usuario</option>
@@ -152,7 +156,7 @@ export default function EmpleadoFormPage() {
                   </option>
                 ))}
               </select>
-              {errors.usuarioId && <p className="text-sm text-destructive">{errors.usuarioId.message}</p>}
+              {errors.usuarioId && <p id="usuarioId-error" className="text-sm text-destructive">{errors.usuarioId.message}</p>}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -160,6 +164,8 @@ export default function EmpleadoFormPage() {
               <select
                 id="especialidadId"
                 className="border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm"
+                aria-invalid={errors.especialidadId ? true : undefined}
+                aria-describedby={errors.especialidadId ? "especialidadId-error" : undefined}
                 {...register("especialidadId")}
                 onChange={alCambiarEspecialidad}
               >
@@ -170,14 +176,20 @@ export default function EmpleadoFormPage() {
                   </option>
                 ))}
               </select>
-              {errors.especialidadId && <p className="text-sm text-destructive">{errors.especialidadId.message}</p>}
+              {errors.especialidadId && <p id="especialidadId-error" className="text-sm text-destructive">{errors.especialidadId.message}</p>}
             </div>
 
             <div className="flex flex-col gap-2">
               <Label htmlFor="codigoEmpleado">Código de empleado</Label>
-              <Input id="codigoEmpleado" placeholder="EMP-001" {...register("codigoEmpleado")} />
+              <Input
+                id="codigoEmpleado"
+                placeholder="EMP-001"
+                aria-invalid={errors.codigoEmpleado ? true : undefined}
+                aria-describedby={errors.codigoEmpleado ? "codigoEmpleado-error" : undefined}
+                {...register("codigoEmpleado")}
+              />
               <p className="text-xs text-muted-foreground">Solo letras, números, guiones y guiones bajos.</p>
-              {errors.codigoEmpleado && <p className="text-sm text-destructive">{errors.codigoEmpleado.message}</p>}
+              {errors.codigoEmpleado && <p id="codigoEmpleado-error" className="text-sm text-destructive">{errors.codigoEmpleado.message}</p>}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -186,13 +198,15 @@ export default function EmpleadoFormPage() {
                 id="descripcion"
                 rows={3}
                 className="border-input flex min-h-20 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm"
+                aria-invalid={errors.descripcion ? true : undefined}
+                aria-describedby={errors.descripcion ? "descripcion-error" : undefined}
                 {...register("descripcion")}
               />
-              {errors.descripcion && <p className="text-sm text-destructive">{errors.descripcion.message}</p>}
+              {errors.descripcion && <p id="descripcion-error" className="text-sm text-destructive">{errors.descripcion.message}</p>}
             </div>
 
-            <div className="flex flex-col gap-2">
-              <Label>Servicios que puede realizar</Label>
+            <fieldset className="flex flex-col gap-2">
+              <legend className="text-sm leading-none font-medium">Servicios que puede realizar</legend>
               {!especialidadId ? (
                 <p className="text-sm text-muted-foreground">Seleccione una especialidad para ver sus servicios.</p>
               ) : serviciosDeEspecialidad.length === 0 ? (
@@ -207,8 +221,10 @@ export default function EmpleadoFormPage() {
                   ))}
                 </div>
               )}
-              {errors.servicioIds && <p className="text-sm text-destructive">{errors.servicioIds.message}</p>}
-            </div>
+              {errors.servicioIds && (
+                <p id="servicioIds-error" className="text-sm text-destructive">{errors.servicioIds.message}</p>
+              )}
+            </fieldset>
           </CardContent>
           <CardFooter className="flex gap-2">
             <Button type="submit" disabled={isSubmitting}>

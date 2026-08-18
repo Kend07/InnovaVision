@@ -1,10 +1,12 @@
 import { useFetch } from "@/hooks/useFetch";
 import { obtenerAdicionales } from "@/lib/adicionales";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Link } from "react-router-dom"
 
 
 export default function AdicionalesPage() {
+    usePageTitle("Adicionales")
     const { data: adicionales, cargando, error } = useFetch(obtenerAdicionales)
 
     if (cargando) {
