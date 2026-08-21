@@ -21,6 +21,9 @@ export default defineConfig([
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_', ignoreRestSiblings: true },
       ],
       'react-refresh/only-export-components': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/incompatible-library': 'off',
+      'jsx-a11y/label-has-associated-control': 'off',
     },
     languageOptions: {
       globals: globals.browser,

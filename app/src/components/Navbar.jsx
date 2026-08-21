@@ -28,6 +28,13 @@ export default function Navbar() {
 
   const enlaces = [
     { to: "/perfil", texto: "Mi perfil" },
+    { to: "/citas", texto: "Citas" },
+    ...(usuario?.rol?.nombre === "Administrador"
+      ? [{ to: "/citas/agenda", texto: "Agenda diaria" }]
+      : []),
+    ...(usuario?.rol?.nombre === "Empleado"
+      ? [{ to: "/citas/mi-agenda", texto: "Mi agenda" }]
+      : []),
     { to: "/servicios", texto: "Servicios" },
     { to: "/adicionales", texto: "Adicionales" },
     ...(usuario?.rol?.nombre === "Administrador" ? [{ to: "/empleados", texto: "Empleados" }] : []),

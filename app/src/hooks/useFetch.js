@@ -10,7 +10,6 @@ export function useFetch(fetchFn, deps = []) {
     useEffect(() => {
         let activo = true
 
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setEstado((prev) => ({ ...prev, cargando: true, error: null }))
 
         fetchFn()

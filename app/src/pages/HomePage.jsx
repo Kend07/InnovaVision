@@ -8,16 +8,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 const OPCIONES_POR_ROL = {
   Administrador: [
-    { titulo: "Gestión de usuarios", descripcion: "Consultar y administrar los usuarios del sistema.", ruta: null },
+    { titulo: "Gestión de citas", descripcion: "Listar, crear y administrar todas las citas.", ruta: "/citas" },
+    { titulo: "Agenda diaria", descripcion: "Consultar la agenda diaria completa del establecimiento.", ruta: "/citas/agenda" },
     { titulo: "Gestión de servicios", descripcion: "Administrar los servicios ofrecidos.", ruta: "/servicios" },
     { titulo: "Servicios adicionales", descripcion: "Administrar los servicios adicionales.", ruta: "/adicionales" },
     { titulo: "Gestión de empleados", descripcion: "Administrar los empleados del establecimiento.", ruta: "/empleados" },
   ],
-  Empleado: [{ titulo: "Mis citas asignadas", descripcion: "Consultar y atender las citas asignadas.", ruta: null }],
-  Cliente: [
-    { titulo: "Registrar cita", descripcion: "Agendar una nueva cita.", ruta: null },
-    { titulo: "Mis citas", descripcion: "Consultar y cancelar mis citas.", ruta: null },
+  Empleado: [
+    { titulo: "Mis citas asignadas", descripcion: "Consultar y atender las citas asignadas.", ruta: "/citas" },
+    { titulo: "Mi agenda", descripcion: "Consultar tu agenda por fecha.", ruta: "/citas/mi-agenda" },
   ],
+  Cliente: [{ titulo: "Mis citas", descripcion: "Consultar y cancelar mis citas.", ruta: "/citas" }],
 }
 
 export default function HomePage() {

@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
 
-export default function RequireRole({ rol, children }) {
+export default function RequireRole({ rol, roles, children }) {
   const { usuario, cargando } = useAuth()
 
   if (cargando) {
@@ -12,9 +12,17 @@ export default function RequireRole({ rol, children }) {
     )
   }
 
-  if (usuario?.rol?.nombre !== rol) {
+  const permitidos = roles || (rol ? [rol] : [])
+  // si no se especifican roles, permite a cualquier autenticado
+  if (permitidos.length === 0) return children
+
+  if (!permitidos.includes(usuario?.rol?.nombre)) {
     return <Navigate to="/" replace />
   }
 
   return children
+}
+
+export function RequireAnyRole({ roles, children }) {
+  return <RequireRole roles={roles}>{children}</RequireRole>
 }

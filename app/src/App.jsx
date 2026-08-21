@@ -13,6 +13,11 @@ import AdicionalDetailPage from "@/pages/AdicionalDetailPage"
 import EmpleadosPage from "@/pages/empleados/EmpleadosPage"
 import EmpleadoFormPage from "@/pages/empleados/EmpleadoFormPage"
 import EmpleadoDetallePage from "@/pages/empleados/EmpleadoDetallePage"
+import CitasPage from "@/pages/citas/CitasPage"
+import CitaDetallePage from "@/pages/citas/CitaDetallePage"
+import CitaFormPage from "@/pages/citas/CitaFormPage"
+import AgendaDiariaPage from "@/pages/citas/AgendaDiariaPage"
+import MiAgendaPage from "@/pages/citas/MiAgendaPage"
 import RequireRole from "@/components/RequireRole"
 
 export default function App() {
@@ -61,6 +66,40 @@ export default function App() {
             <Route path="/servicios/:id" element={<ServicioDetallePage />} />
             <Route path="/adicionales" element={<AdicionalesPage />} />
             <Route path="/adicionales/:id" element={<AdicionalDetailPage />} />
+            <Route path="/citas" element={<CitasPage />} />
+            <Route
+              path="/citas/agenda"
+              element={
+                <RequireRole rol="Administrador">
+                  <AgendaDiariaPage />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/citas/mi-agenda"
+              element={
+                <RequireRole rol="Empleado">
+                  <MiAgendaPage />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/citas/nueva"
+              element={
+                <RequireRole roles={["Administrador", "Empleado"]}>
+                  <CitaFormPage />
+                </RequireRole>
+              }
+            />
+            <Route path="/citas/:id" element={<CitaDetallePage />} />
+            <Route
+              path="/citas/:id/editar"
+              element={
+                <RequireRole roles={["Administrador", "Empleado"]}>
+                  <CitaFormPage />
+                </RequireRole>
+              }
+            />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
