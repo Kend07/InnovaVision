@@ -37,6 +37,7 @@ export default function Navbar() {
       : []),
     { to: "/servicios", texto: "Servicios" },
     { to: "/adicionales", texto: "Adicionales" },
+    { to: "/horarios", texto: "Horarios" },
     ...(usuario?.rol?.nombre === "Administrador" ? [{ to: "/empleados", texto: "Empleados" }] : []),
   ]
 
