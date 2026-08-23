@@ -39,6 +39,9 @@ export default function Navbar() {
     { to: "/adicionales", texto: "Adicionales" },
     { to: "/horarios", texto: "Horarios" },
     ...(usuario?.rol?.nombre === "Administrador" ? [{ to: "/empleados", texto: "Empleados" }] : []),
+    ...(usuario?.rol?.nombre === "Administrador" || usuario?.rol?.nombre === "Empleado"
+  ? [{ to: "/restricciones", texto: "Restricciones" }]
+  : []),
   ]
 
   const claseEnlace = ({ isActive }) =>
