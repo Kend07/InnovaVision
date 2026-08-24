@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Label } from "@/components/ui/label"
 
 const FORMATOS_PERMITIDOS = ["image/jpeg", "image/jpg", "image/png", "image/webp"]
@@ -8,6 +8,19 @@ export default function ImageUploadField({ label, previewUrlInicial, onArchivoSe
     const [previewUrl, setPreviewUrl] = useState(previewUrlInicial || null)
     const [error, setError] = useState(null)
     const inputRef = useRef(null)
+    const objectUrlRef = useRef(null)
+
+    useEffect(() => {
+        setPreviewUrl(previewUrlInicial || null)
+    }, [previewUrlInicial])
+
+    useEffect(() => {
+        return () => {
+            if (objectUrlRef.current) {
+                URL.revokeObjectURL(objectUrlRef.current)
+            }
+        }
+    }, [])
 
     function manejarCambio(evento) {
         const archivo = evento.target.files[0]
@@ -27,7 +40,11 @@ export default function ImageUploadField({ label, previewUrlInicial, onArchivoSe
         }
 
         setError(null)
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current)
+        }
         const urlLocal = URL.createObjectURL(archivo)
+        objectUrlRef.current = urlLocal
         setPreviewUrl(urlLocal)
         onArchivoSeleccionado(archivo)
     }

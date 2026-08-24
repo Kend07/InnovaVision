@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
+import { BrowserRouter, Route, Routes } from "react-router-dom"
 import { AuthProvider } from "@/context/AuthContext"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import MainLayout from "@/layouts/MainLayout"
@@ -10,6 +10,7 @@ import ServiciosPage from "@/pages/ServiciosPage"
 import ServicioDetallePage from "@/pages/ServicioDetallePage"
 import AdicionalesPage from "@/pages/AdicionalesServicePage"
 import AdicionalDetailPage from "@/pages/AdicionalDetailPage"
+import AdicionalFormPage from "@/pages/AdicionalFormPage"
 import EmpleadosPage from "@/pages/empleados/EmpleadosPage"
 import EmpleadoFormPage from "@/pages/empleados/EmpleadoFormPage"
 import EmpleadoDetallePage from "@/pages/empleados/EmpleadoDetallePage"
@@ -68,7 +69,6 @@ export default function App() {
               }
             />
             <Route path="/servicios" element={<ServiciosPage />} />
-            <Route path="/servicios/:id" element={<ServicioDetallePage />} />
             <Route
               path="/servicios/nuevo"
               element={
@@ -85,7 +85,24 @@ export default function App() {
                 </RequireRole>
               }
             />
+            <Route path="/servicios/:id" element={<ServicioDetallePage />} />
             <Route path="/adicionales" element={<AdicionalesPage />} />
+            <Route
+              path="/adicionales/nuevo"
+              element={
+                <RequireRole rol="Administrador">
+                  <AdicionalFormPage />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/adicionales/:id/editar"
+              element={
+                <RequireRole rol="Administrador">
+                  <AdicionalFormPage />
+                </RequireRole>
+              }
+            />
             <Route path="/adicionales/:id" element={<AdicionalDetailPage />} />
             <Route path="/horarios" element={<HorariosPage />} />
             <Route path="/citas" element={<CitasPage />} />
