@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useFetch } from "@/hooks/useFetch"
 import { obtenerAdicionales, cambiarEstadoAdicional } from "@/lib/adicionales"
 import { usePageTitle } from "@/hooks/usePageTitle"
@@ -14,7 +14,19 @@ export default function AdicionalesPage() {
     const [recarga, setRecarga] = useState(0)
     const [errorAccion, setErrorAccion] = useState("")
     const [exitoAccion, setExitoAccion] = useState("")
+    const [busqueda, setBusqueda] = useState("")
+    const [ordenAsc, setOrdenAsc] = useState(true)
     const { data: adicionales, cargando, error } = useFetch(obtenerAdicionales, [recarga])
+
+    const adicionalesFiltrados = useMemo(() => {
+        let lista = [...(adicionales || [])]
+        if (busqueda.trim()) {
+            const q = busqueda.toLowerCase()
+            lista = lista.filter((a) => a.nombre.toLowerCase().includes(q) || a.descripcion?.toLowerCase().includes(q))
+        }
+        lista.sort((a, b) => ordenAsc ? a.nombre.localeCompare(b.nombre) : b.nombre.localeCompare(a.nombre))
+        return lista
+    }, [adicionales, busqueda, ordenAsc])
 
     async function handleCambiarEstado(adicional) {
         const nuevoEstado = !adicional.activo
@@ -40,28 +52,36 @@ export default function AdicionalesPage() {
 
     return (
         <div className="p-6">
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h1 className="text-2xl font-bold">Adicionales</h1>
-                {esAdmin && (
-                    <Button asChild>
-                        <Link to="/adicionales/nuevo">Nuevo adicional</Link>
-                    </Button>
-                )}
+                <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setOrdenAsc((v) => !v)}>Orden: {ordenAsc ? "A → Z" : "Z → A"}</Button>
+                    {esAdmin && (
+                        <Button asChild>
+                            <Link to="/adicionales/nuevo">Nuevo adicional</Link>
+                        </Button>
+                    )}
+                </div>
+            </div>
+
+            <div className="mb-4 flex gap-2">
+                <input placeholder="Buscar por nombre o descripción" className="border-input flex h-9 w-full max-w-md rounded-md border bg-transparent px-3 py-1 text-sm" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
+                {busqueda && <Button variant="ghost" onClick={() => setBusqueda("")}>Limpiar</Button>}
             </div>
 
             {errorAccion && <p className="mb-4 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{errorAccion}</p>}
             {exitoAccion && <p className="mb-4 rounded-md bg-emerald-50 border border-emerald-200 px-3 py-2 text-sm text-emerald-800">{exitoAccion}</p>}
 
-            {!adicionales || adicionales.length === 0 ? (
+            {!adicionalesFiltrados || adicionalesFiltrados.length === 0 ? (
                 <Card>
                     <CardContent className="py-12 text-center">
-                        <p className="text-muted-foreground">No hay adicionales registrados.</p>
+                        <p className="text-muted-foreground">{adicionales?.length ? "Sin resultados para la búsqueda." : "No hay adicionales registrados."}</p>
                         {esAdmin && <p className="text-sm text-muted-foreground mt-1">Cree un adicional para comenzar.</p>}
                     </CardContent>
                 </Card>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {adicionales.map((adicional) => (
+                    {adicionalesFiltrados.map((adicional) => (
                         <Card key={adicional.id} className="h-full flex flex-col">
                             <CardHeader>
                                 <div className="flex items-start justify-between gap-2">

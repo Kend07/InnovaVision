@@ -21,6 +21,7 @@ import AgendaDiariaPage from "@/pages/citas/AgendaDiariaPage"
 import MiAgendaPage from "@/pages/citas/MiAgendaPage"
 import RequireRole from "@/components/RequireRole"
 import HorariosPage from "@/pages/HorariosPage"
+import HorarioDetailPage from "@/pages/HorarioDetailPage"
 import RestriccionesPage from "@/pages/RestriccionesPage"
 import RestriccionDetailPage from "@/pages/RestriccionDetailPage"
 import NotFoundPage from "@/pages/NotFoundPage"
@@ -105,6 +106,7 @@ export default function App() {
             />
             <Route path="/adicionales/:id" element={<AdicionalDetailPage />} />
             <Route path="/horarios" element={<HorariosPage />} />
+            <Route path="/horarios/:id" element={<HorarioDetailPage />} />
             <Route path="/citas" element={<CitasPage />} />
             <Route path="/restricciones" element={<RestriccionesPage />} />
             <Route path="/restricciones/:id" element={<RestriccionDetailPage />} />

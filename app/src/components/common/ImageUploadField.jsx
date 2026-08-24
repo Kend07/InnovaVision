@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label"
 const FORMATOS_PERMITIDOS = ["image/jpeg", "image/jpg", "image/png", "image/webp"]
 const TAMANO_MAXIMO_MB = 2
 
-export default function ImageUploadField({ label, previewUrlInicial, onArchivoSeleccionado }) {
+export default function ImageUploadField({ label, previewUrlInicial, onArchivoSeleccionado, errorExterno }) {
     const [previewUrl, setPreviewUrl] = useState(previewUrlInicial || null)
     const [error, setError] = useState(null)
     const inputRef = useRef(null)
@@ -49,6 +49,7 @@ export default function ImageUploadField({ label, previewUrlInicial, onArchivoSe
         onArchivoSeleccionado(archivo)
     }
 
+    const errorVisible = errorExterno || error
     return (
         <div className="space-y-2">
             {label && <Label>{label}</Label>}
@@ -66,10 +67,12 @@ export default function ImageUploadField({ label, previewUrlInicial, onArchivoSe
                 type="file"
                 accept="image/jpeg,image/jpg,image/png,image/webp"
                 onChange={manejarCambio}
-                className="block w-full text-sm text-muted-foreground file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
+                aria-invalid={errorVisible ? true : undefined}
+                aria-describedby={errorVisible ? "imagen-error" : undefined}
+                className={`block w-full text-sm text-muted-foreground file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90 ${errorVisible ? "rounded-md ring-2 ring-destructive" : ""}`}
             />
 
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {errorVisible && <p id="imagen-error" className="text-sm text-destructive">{errorVisible}</p>}
         </div>
     )
 }

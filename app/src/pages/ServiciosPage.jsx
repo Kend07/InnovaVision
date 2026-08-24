@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useFetch } from "@/hooks/useFetch"
 import { obtenerServicios, cambiarEstadoServicio } from "@/lib/servicios"
 import { urlImagen } from "@/lib/images"
@@ -15,7 +15,19 @@ export default function ServiciosPage() {
     const [recarga, setRecarga] = useState(0)
     const [errorAccion, setErrorAccion] = useState("")
     const [exitoAccion, setExitoAccion] = useState("")
+    const [busqueda, setBusqueda] = useState("")
+    const [ordenAsc, setOrdenAsc] = useState(true)
     const { data: servicios, cargando, error } = useFetch(obtenerServicios, [recarga])
+
+    const serviciosFiltrados = useMemo(() => {
+        let lista = [...(servicios || [])]
+        if (busqueda.trim()) {
+            const q = busqueda.toLowerCase()
+            lista = lista.filter((s) => s.nombre.toLowerCase().includes(q) || s.descripcion?.toLowerCase().includes(q) || s.especialidad?.nombre?.toLowerCase().includes(q))
+        }
+        lista.sort((a, b) => ordenAsc ? a.nombre.localeCompare(b.nombre) : b.nombre.localeCompare(a.nombre))
+        return lista
+    }, [servicios, busqueda, ordenAsc])
 
     async function handleCambiarEstado(servicio) {
         const nuevoEstado = !servicio.activo
@@ -41,13 +53,21 @@ export default function ServiciosPage() {
 
     return (
         <div className="p-6">
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h1 className="text-2xl font-bold">Servicios</h1>
-                {esAdmin && (
-                    <Button asChild>
-                        <Link to="/servicios/nuevo">Nuevo servicio</Link>
-                    </Button>
-                )}
+                <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setOrdenAsc((v) => !v)}>Orden: {ordenAsc ? "A → Z" : "Z → A"}</Button>
+                    {esAdmin && (
+                        <Button asChild>
+                            <Link to="/servicios/nuevo">Nuevo servicio</Link>
+                        </Button>
+                    )}
+                </div>
+            </div>
+
+            <div className="mb-4 flex gap-2">
+                <input placeholder="Buscar por nombre, descripción o especialidad" className="border-input flex h-9 w-full max-w-md rounded-md border bg-transparent px-3 py-1 text-sm" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
+                {busqueda && <Button variant="ghost" onClick={() => setBusqueda("")}>Limpiar</Button>}
             </div>
 
             {errorAccion && (
@@ -57,16 +77,16 @@ export default function ServiciosPage() {
                 <p className="mb-4 rounded-md bg-emerald-50 border border-emerald-200 px-3 py-2 text-sm text-emerald-800">{exitoAccion}</p>
             )}
 
-            {!servicios || servicios.length === 0 ? (
+            {!serviciosFiltrados || serviciosFiltrados.length === 0 ? (
                 <Card>
                     <CardContent className="py-12 text-center">
-                        <p className="text-muted-foreground">No hay servicios registrados.</p>
+                        <p className="text-muted-foreground">{servicios?.length ? "Sin resultados para la búsqueda." : "No hay servicios registrados."}</p>
                         {esAdmin && <p className="text-sm text-muted-foreground mt-1">Cree un nuevo servicio para comenzar.</p>}
                     </CardContent>
                 </Card>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {servicios.map((servicio) => (
+                    {serviciosFiltrados.map((servicio) => (
                         <Card key={servicio.id} className="h-full flex flex-col">
                             <CardHeader>
                                 <div className="flex items-start justify-between gap-2">

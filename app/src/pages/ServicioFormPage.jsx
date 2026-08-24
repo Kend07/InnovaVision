@@ -31,6 +31,7 @@ export default function ServicioFormPage() {
     const [archivoImagen, setArchivoImagen] = useState(null)
     const [errorGeneral, setErrorGeneral] = useState("")
     const [erroresApi, setErroresApi] = useState([])
+    const [errorImagen, setErrorImagen] = useState("")
 
     const { data: servicio, cargando: cargandoServicio } = useFetch(
         () => (esEdicion ? obtenerServicioPorId(id) : Promise.resolve({ data: { data: null } })),
@@ -66,6 +67,11 @@ export default function ServicioFormPage() {
     async function alEnviar(datos) {
         setErrorGeneral("")
         setErroresApi([])
+        setErrorImagen("")
+        if (!esEdicion && !archivoImagen) {
+            setErrorImagen("La imagen es obligatoria para crear un servicio")
+            return
+        }
         try {
             let nombreImagen = servicio?.imagen ?? null
 
@@ -187,8 +193,8 @@ export default function ServicioFormPage() {
                             {errors.especialidadId && <p id="especialidadId-error" className="text-sm text-destructive">{errors.especialidadId.message}</p>}
                         </div>
 
-                        <ImageUploadField label="Imagen del servicio (opcional)" previewUrlInicial={previewInicial} onArchivoSeleccionado={setArchivoImagen} />
-                        <p className="text-xs text-muted-foreground">Formatos: JPG, PNG, WEBP. Máx. 2MB. Si no selecciona nueva imagen, se conserva la actual.</p>
+                        <ImageUploadField label={esEdicion ? "Imagen del servicio (opcional, deja la actual si no cambias)" : "Imagen del servicio *"} previewUrlInicial={previewInicial} onArchivoSeleccionado={(f) => { setArchivoImagen(f); setErrorImagen("") }} errorExterno={errorImagen} />
+                        <p className="text-xs text-muted-foreground">Formatos: JPG, PNG, WEBP. Máx. 2MB. {esEdicion ? "Si no selecciona nueva imagen, se conserva la actual." : "Obligatoria al crear."}</p>
                     </CardContent>
                     <CardFooter className="flex gap-2">
                         <Button type="submit" disabled={isSubmitting}>

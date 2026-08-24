@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react"
 import { Outlet, useLocation } from "react-router-dom"
 import Navbar from "@/components/Navbar"
+import Breadcrumb from "@/components/common/Breadcrumb"
+import Footer from "@/components/Footer"
 
 export default function MainLayout() {
   const location = useLocation()
@@ -19,6 +21,7 @@ export default function MainLayout() {
         Saltar al contenido
       </a>
       <Navbar />
+      <Breadcrumb />
       <main
         id="contenido-principal"
         ref={mainRef}
@@ -27,6 +30,7 @@ export default function MainLayout() {
       >
         <Outlet />
       </main>
+      <Footer />
     </div>
   )
 }

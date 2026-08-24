@@ -1,5 +1,7 @@
+import { Link } from "react-router-dom"
 import { useFetch } from "@/hooks/useFetch"
 import { obtenerHorarios } from "@/lib/horarios"
+import { Button } from "@/components/ui/button"
 import {
     Table,
     TableHeader,
@@ -45,6 +47,7 @@ export default function HorariosPage() {
                             <TableHead>Hora inicio</TableHead>
                             <TableHead>Hora fin</TableHead>
                             <TableHead>Estado</TableHead>
+                            <TableHead className="text-right">Acciones</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -54,6 +57,11 @@ export default function HorariosPage() {
                                 <TableCell>{formatearHora(horario.horaInicio)}</TableCell>
                                 <TableCell>{formatearHora(horario.horaFin)}</TableCell>
                                 <TableCell>{horario.activo ? "Activo" : "Inactivo"}</TableCell>
+                                <TableCell className="text-right">
+                                    <Link to={`/horarios/${horario.id}`}>
+                                        <Button variant="outline" size="sm">Ver detalle</Button>
+                                    </Link>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
