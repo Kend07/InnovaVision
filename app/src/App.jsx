@@ -22,6 +22,7 @@ import RequireRole from "@/components/RequireRole"
 import HorariosPage from "@/pages/HorariosPage"
 import RestriccionesPage from "@/pages/RestriccionesPage"
 import RestriccionDetailPage from "@/pages/RestriccionDetailPage"
+import NotFoundPage from "@/pages/NotFoundPage"
 
 export default function App() {
   return (
@@ -107,7 +108,7 @@ export default function App() {
               }
             />
           </Route>
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
