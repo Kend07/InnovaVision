@@ -7,3 +7,7 @@ export function obtenerServicios() {
 export function obtenerServicioPorId(id) {
     return api.get(`/servicios/${id}`)
 }
+
+export function crearServicio(datos) {
+    return api.post("/servicios", datos)
+}

@@ -23,6 +23,7 @@ import HorariosPage from "@/pages/HorariosPage"
 import RestriccionesPage from "@/pages/RestriccionesPage"
 import RestriccionDetailPage from "@/pages/RestriccionDetailPage"
 import NotFoundPage from "@/pages/NotFoundPage"
+import ServicioFormPage from "@/pages/ServicioFormPage"
 
 export default function App() {
   return (
@@ -68,6 +69,22 @@ export default function App() {
             />
             <Route path="/servicios" element={<ServiciosPage />} />
             <Route path="/servicios/:id" element={<ServicioDetallePage />} />
+            <Route
+              path="/servicios/nuevo"
+              element={
+                <RequireRole rol="Administrador">
+                  <ServicioFormPage />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/servicios/:id/editar"
+              element={
+                <RequireRole rol="Administrador">
+                  <ServicioFormPage />
+                </RequireRole>
+              }
+            />
             <Route path="/adicionales" element={<AdicionalesPage />} />
             <Route path="/adicionales/:id" element={<AdicionalDetailPage />} />
             <Route path="/horarios" element={<HorariosPage />} />
