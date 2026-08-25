@@ -30,7 +30,7 @@ export const usuarioService = {
     /**
      * Lista usuarios.
      *
-     * Permite filtrar por rol:
+     * Permite filtrar por :
      * GET /usuarios?rol=Cliente
      */
     async listar(rol?: string) {
