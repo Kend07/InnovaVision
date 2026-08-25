@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { Calendar, Wrench, PlusCircle, Clock, ShieldAlert, Users, Eye } from "lucide-react"
 
 export default function Navbar() {
   const { usuario, logout } = useAuth()
@@ -28,25 +29,27 @@ export default function Navbar() {
 
   const enlaces = [
     { to: "/perfil", texto: "Mi perfil" },
-    { to: "/citas", texto: "Citas" },
+    { to: "/citas", texto: "Citas", icono: Calendar },
     ...(usuario?.rol?.nombre === "Administrador"
-      ? [{ to: "/citas/agenda", texto: "Agenda diaria" }]
+      ? [{ to: "/citas/agenda", texto: "Agenda diaria", icono: Calendar }]
       : []),
     ...(usuario?.rol?.nombre === "Empleado"
-      ? [{ to: "/citas/mi-agenda", texto: "Mi agenda" }]
+      ? [{ to: "/citas/mi-agenda", texto: "Mi agenda", icono: Calendar }]
       : []),
-    { to: "/servicios", texto: "Servicios" },
-    { to: "/adicionales", texto: "Adicionales" },
-    { to: "/horarios", texto: "Horarios" },
-    ...(usuario?.rol?.nombre === "Administrador" ? [{ to: "/empleados", texto: "Empleados" }] : []),
+    { to: "/servicios", texto: "Servicios", icono: Wrench },
+    { to: "/adicionales", texto: "Adicionales", icono: PlusCircle },
+    { to: "/horarios", texto: "Horarios", icono: Clock },
+    ...(usuario?.rol?.nombre === "Administrador"
+      ? [{ to: "/empleados", texto: "Empleados", icono: Users }]
+      : []),
     ...(usuario?.rol?.nombre === "Administrador" || usuario?.rol?.nombre === "Empleado"
-  ? [{ to: "/restricciones", texto: "Restricciones" }]
-  : []),
+      ? [{ to: "/restricciones", texto: "Restricciones", icono: ShieldAlert }]
+      : []),
   ]
 
   const claseEnlace = ({ isActive }) =>
     cn(
-      "rounded-md px-3 py-2 text-sm transition-colors",
+      "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
       isActive
         ? "bg-accent font-medium text-foreground"
         : "text-muted-foreground hover:text-foreground"
@@ -62,16 +65,21 @@ export default function Navbar() {
           <Link
             to="/"
             onClick={() => setMenuAbierto(false)}
-            className="text-lg font-semibold hover:underline"
+            className="flex items-center gap-2 text-lg font-semibold hover:underline"
           >
+            <Eye className="h-5 w-5 text-primary" />
             Gestión de Citas
           </Link>
           <div className="hidden items-center gap-2 md:flex">
-            {enlaces.map((enlace) => (
-              <NavLink key={enlace.to} to={enlace.to} className={claseEnlace}>
-                {enlace.texto}
-              </NavLink>
-            ))}
+            {enlaces.map((enlace) => {
+              const Icono = enlace.icono
+              return (
+                <NavLink key={enlace.to} to={enlace.to} className={claseEnlace}>
+                  {Icono && <Icono className="h-4 w-4" />}
+                  {enlace.texto}
+                </NavLink>
+              )
+            })}
           </div>
         </div>
         <div className="flex items-center gap-4">
@@ -120,16 +128,20 @@ export default function Navbar() {
       {menuAbierto && (
         <div id="menu-movil" className="border-t px-4 py-3 md:hidden">
           <div className="flex flex-col gap-1">
-            {enlaces.map((enlace) => (
-              <NavLink
-                key={enlace.to}
-                to={enlace.to}
-                className={claseEnlace}
-                onClick={() => setMenuAbierto(false)}
-              >
-                {enlace.texto}
-              </NavLink>
-            ))}
+            {enlaces.map((enlace) => {
+              const Icono = enlace.icono
+              return (
+                <NavLink
+                  key={enlace.to}
+                  to={enlace.to}
+                  className={claseEnlace}
+                  onClick={() => setMenuAbierto(false)}
+                >
+                  {Icono && <Icono className="h-4 w-4" />}
+                  {enlace.texto}
+                </NavLink>
+              )
+            })}
             <div className="mt-2 flex flex-col gap-2 border-t pt-3">
               {usuario && (
                 <p className="text-sm text-muted-foreground">
