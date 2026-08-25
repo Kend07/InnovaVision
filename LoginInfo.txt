@@ -1,0 +1,5 @@
+ADMINISTRADOR:
+
+Correo: admin@citas.com
+Password: Admin12345
+
