@@ -178,6 +178,26 @@ async function main() {
         },
     });
 
+    await prisma.especialidad.upsert({
+        where: { nombre: "Optometria" },
+        update: {},
+        create: {
+            nombre: "Optometria",
+            "descripcion": "Evaluación y corrección de la agudeza visual",
+            activo: true,
+        },
+    });
+
+    await prisma.especialidad.upsert({
+        where: { nombre: "Contactologia" },
+        update: {},
+        create: {
+            nombre: "Contactologia",
+            "descripcion": "Adaptación y seguimiento de lentes de contacto",
+            activo: true,
+        },
+    });
+
     // Usuario administrador
     const passwordHash = await bcrypt.hash("Admin12345", 10);
 
